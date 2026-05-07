@@ -1,0 +1,738 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>你适合在魔幻世界选择什么职业？</title>
+  <style>
+    :root {
+      --ink: #1f2933;
+      --muted: #667085;
+      --line: #d9dee7;
+      --paper: #fbfaf7;
+      --panel: #ffffff;
+      --accent: #b23a48;
+      --accent-2: #0f766e;
+      --gold: #b7791f;
+      --shadow: 0 20px 55px rgba(31, 41, 51, 0.12);
+      font-family: ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", "PingFang SC", "Hiragino Sans GB", "Microsoft YaHei", sans-serif;
+      color: var(--ink);
+      background: var(--paper);
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      margin: 0;
+      min-height: 100vh;
+      background:
+        linear-gradient(135deg, rgba(178, 58, 72, 0.08), transparent 34%),
+        linear-gradient(315deg, rgba(15, 118, 110, 0.09), transparent 36%),
+        var(--paper);
+    }
+
+    button {
+      font: inherit;
+    }
+
+    .app {
+      width: min(1080px, 100%);
+      min-height: 100vh;
+      margin: 0 auto;
+      padding: 22px;
+      display: grid;
+      align-items: center;
+    }
+
+    .shell {
+      width: 100%;
+      background: rgba(255, 255, 255, 0.88);
+      border: 1px solid rgba(217, 222, 231, 0.9);
+      border-radius: 8px;
+      box-shadow: var(--shadow);
+      overflow: hidden;
+      backdrop-filter: blur(12px);
+    }
+
+    header {
+      display: grid;
+      gap: 14px;
+      padding: 20px clamp(18px, 4vw, 36px);
+      border-bottom: 1px solid var(--line);
+      background: rgba(255, 255, 255, 0.72);
+    }
+
+    .topline {
+      display: flex;
+      align-items: baseline;
+      justify-content: space-between;
+      gap: 16px;
+    }
+
+    h1, h2, p {
+      margin: 0;
+    }
+
+    h1 {
+      font-size: clamp(22px, 4vw, 34px);
+      line-height: 1.12;
+      letter-spacing: 0;
+    }
+
+    .meta {
+      color: var(--muted);
+      font-size: 14px;
+      white-space: nowrap;
+    }
+
+    .progress-track {
+      height: 10px;
+      overflow: hidden;
+      border-radius: 999px;
+      background: #eceff3;
+    }
+
+    .progress-fill {
+      height: 100%;
+      width: 0%;
+      background: linear-gradient(90deg, var(--accent), var(--gold), var(--accent-2));
+      transition: width 240ms ease;
+    }
+
+    main {
+      padding: clamp(18px, 4vw, 38px);
+    }
+
+    .question-pane {
+      display: grid;
+      gap: clamp(18px, 3vw, 28px);
+    }
+
+    .dimension-chip {
+      width: fit-content;
+      max-width: 100%;
+      color: #5f2630;
+      background: #f8e9ea;
+      border: 1px solid #efc8cd;
+      border-radius: 999px;
+      padding: 7px 12px;
+      font-size: 13px;
+      line-height: 1.35;
+    }
+
+    .question-text {
+      font-size: clamp(19px, 3vw, 28px);
+      line-height: 1.45;
+      letter-spacing: 0;
+    }
+
+    .choices {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 14px;
+    }
+
+    .choice {
+      min-height: 138px;
+      display: grid;
+      align-content: start;
+      gap: 8px;
+      padding: 18px;
+      border-radius: 8px;
+      border: 1px solid var(--line);
+      background: #fff;
+    }
+
+    .choice strong {
+      color: var(--accent);
+      font-size: 14px;
+    }
+
+    .choice p {
+      color: #354052;
+      font-size: clamp(15px, 2vw, 17px);
+      line-height: 1.65;
+    }
+
+    .scale {
+      display: grid;
+      grid-template-columns: repeat(5, minmax(0, 1fr));
+      gap: 10px;
+    }
+
+    .scale button,
+    .nav button,
+    .result-actions button {
+      min-height: 46px;
+      border-radius: 8px;
+      border: 1px solid var(--line);
+      background: #fff;
+      color: var(--ink);
+      cursor: pointer;
+      transition: transform 160ms ease, border-color 160ms ease, background 160ms ease, color 160ms ease;
+    }
+
+    .scale button {
+      padding: 10px 8px;
+      line-height: 1.25;
+      font-size: 14px;
+    }
+
+    .scale button:hover,
+    .nav button:hover,
+    .result-actions button:hover {
+      transform: translateY(-1px);
+      border-color: #aeb7c4;
+    }
+
+    .scale button.selected {
+      border-color: var(--accent);
+      background: #fff3f4;
+      color: #862633;
+      box-shadow: inset 0 0 0 1px var(--accent);
+    }
+
+    .nav {
+      display: flex;
+      justify-content: space-between;
+      gap: 12px;
+      padding-top: 4px;
+    }
+
+    .nav button,
+    .result-actions button {
+      padding: 0 16px;
+      font-weight: 650;
+    }
+
+    .nav .primary,
+    .result-actions .primary {
+      border-color: var(--accent);
+      background: var(--accent);
+      color: #fff;
+    }
+
+    button:disabled {
+      opacity: 0.45;
+      cursor: not-allowed;
+      transform: none;
+    }
+
+    .hidden {
+      display: none;
+    }
+
+    .results {
+      display: grid;
+      gap: 24px;
+    }
+
+    .result-title {
+      display: grid;
+      gap: 8px;
+    }
+
+    .result-title h2 {
+      font-size: clamp(25px, 5vw, 42px);
+      line-height: 1.12;
+      letter-spacing: 0;
+    }
+
+    .career {
+      color: #2f3a48;
+      font-size: clamp(17px, 2vw, 20px);
+      line-height: 1.55;
+      text-align: left;
+    }
+
+    .career strong {
+      color: var(--accent);
+      font-size: 1.18em;
+    }
+
+    .result-image {
+      display: block;
+      width: min(180px, 48vw);
+      max-height: 215px;
+      object-fit: contain;
+      margin: 4px auto 0;
+      border-radius: 8px;
+      box-shadow: 0 18px 42px rgba(31, 41, 51, 0.16);
+    }
+
+    .bars {
+      display: grid;
+      gap: 18px;
+    }
+
+    .bar-card {
+      display: grid;
+      gap: 10px;
+      padding: 16px;
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      background: var(--panel);
+    }
+
+    .bar-head {
+      display: flex;
+      justify-content: space-between;
+      gap: 14px;
+      color: #354052;
+      font-size: 14px;
+      line-height: 1.4;
+    }
+
+    .bar-head strong {
+      color: var(--ink);
+    }
+
+    .bar {
+      position: relative;
+      height: 16px;
+      border-radius: 999px;
+      background: linear-gradient(90deg, #b23a48, #eef1f4 50%, #0f766e);
+      border: 1px solid #cdd5df;
+    }
+
+    .bar::after {
+      content: "";
+      position: absolute;
+      top: -7px;
+      left: var(--pos);
+      width: 6px;
+      height: 28px;
+      border-radius: 999px;
+      background: #1f2933;
+      transform: translateX(-50%);
+      box-shadow: 0 4px 10px rgba(31, 41, 51, 0.22);
+    }
+
+    .bar-labels {
+      display: flex;
+      justify-content: space-between;
+      gap: 16px;
+      color: var(--muted);
+      font-size: 13px;
+      line-height: 1.35;
+    }
+
+    .result-actions {
+      display: flex;
+      justify-content: flex-end;
+      gap: 12px;
+    }
+
+    @media (max-width: 760px) {
+      .app {
+        padding: 10px;
+        align-items: stretch;
+      }
+
+      .shell {
+        min-height: calc(100vh - 20px);
+      }
+
+      .topline,
+      .bar-head,
+      .result-actions {
+        align-items: stretch;
+        flex-direction: column;
+      }
+
+      .choices {
+        grid-template-columns: 1fr;
+      }
+
+      .scale {
+        grid-template-columns: 1fr;
+      }
+
+      .scale button {
+        min-height: 42px;
+      }
+
+      .choice {
+        min-height: auto;
+      }
+
+      .nav {
+        position: sticky;
+        bottom: 0;
+        margin: 0 calc(clamp(18px, 4vw, 38px) * -1) calc(clamp(18px, 4vw, 38px) * -1);
+        padding: 12px clamp(18px, 4vw, 38px);
+        background: rgba(255, 255, 255, 0.94);
+        border-top: 1px solid var(--line);
+      }
+
+      .nav button {
+        flex: 1;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="app">
+    <section class="shell" aria-live="polite">
+      <header>
+        <div class="topline">
+          <h1>你适合在魔幻世界选择什么职业？</h1>
+          <div class="meta" id="counter">第 1 / 40 题</div>
+        </div>
+        <div class="progress-track" aria-label="答题进度">
+          <div class="progress-fill" id="progress"></div>
+        </div>
+      </header>
+
+      <main>
+        <section class="question-pane" id="quiz">
+          <div class="dimension-chip" id="dimension"></div>
+          <p class="question-text" id="question"></p>
+          <div class="choices">
+            <article class="choice">
+              <strong>A</strong>
+              <p id="choiceA"></p>
+            </article>
+            <article class="choice">
+              <strong>B</strong>
+              <p id="choiceB"></p>
+            </article>
+          </div>
+          <div class="scale" id="scale"></div>
+          <div class="nav">
+            <button type="button" id="prev">← 上一题</button>
+            <button type="button" id="next" class="primary">下一题 →</button>
+          </div>
+        </section>
+
+        <section class="results hidden" id="results">
+          <div class="result-title">
+            <h2 id="resultTitle"></h2>
+            <img class="result-image" id="resultImage" alt="" onerror="this.hidden = true">
+          </div>
+          <div class="bars" id="bars"></div>
+          <p class="career" id="career"></p>
+          <div class="result-actions">
+            <button type="button" id="edit">返回修改</button>
+            <button type="button" class="primary" id="restart">重新作答</button>
+          </div>
+        </section>
+      </main>
+    </section>
+  </div>
+
+  <script>
+    const dimensions = [
+      { key: "front", name: "位置偏好", left: "正面 / 阵地", right: "侧翼 / 远程 / 幕后" },
+      { key: "tactic", name: "战斗风格", left: "击杀 / 爆发", right: "控场 / 续航 / 支援 / 塑形" },
+      { key: "power", name: "力量源泉", left: "身体 / 武技 / 技能 / 训练", right: "知识 / 信仰 / 自然 / 契约 / 奥术" },
+      { key: "society", name: "社会气质", left: "秩序 / 公开 / 共同体认可", right: "边缘 / 隐秘 / 野性 / 混沌" }
+    ];
+
+    const careers = {
+      "0000": { name: "战士 - 战斗大师 / 冠军勇士", entry: "正面", tactic: "击杀", power: "武技", society: "秩序" },
+      "0001": { name: "野蛮人", entry: "正面", tactic: "击杀", power: "身体", society: "边缘 / 野性" },
+      "0010": { name: "圣武士 - 先贤之誓", entry: "正面", tactic: "击杀", power: "神圣 / 誓言", society: "秩序" },
+      "0011": { name: "圣武士 - 复仇 / 破誓", entry: "正面", tactic: "击杀", power: "神圣 / 誓言", society: "边缘 / 混沌" },
+      "0100": { name: "武僧 - 散打", entry: "正面", tactic: "控制", power: "身体 / 技艺", society: "秩序" },
+      "0101": { name: "德鲁伊 - 月亮", entry: "正面", tactic: "控制 / 坦克", power: "身体变形", society: "野性" },
+      "0110": { name: "牧师 - 生命领域", entry: "阵地", tactic: "续航 / 支援", power: "神术", society: "秩序" },
+      "0111": { name: "牧师 - 死灵", entry: "阵地", tactic: "控制", power: "神术 / 死灵", society: "边缘 / 禁忌" },
+      "1000": { name: "战士 - 奥法大师 / 奥数射手", entry: "侧翼 / 远程", tactic: "击杀", power: "武技为骨架", society: "秩序" },
+      "1001": { name: "游侠 / 游荡者", entry: "侧翼 / 幕后", tactic: "击杀 / 突袭", power: "技能 / 武器", society: "隐秘 / 边缘" },
+      "1010": { name: "牧师 - 光明", entry: "远程 / 后排", tactic: "AOE 击杀", power: "神术", society: "秩序" },
+      "1011": { name: "术士 / 邪术师", entry: "远程 / 后排", tactic: "爆发", power: "契约 / 邪术", society: "边缘 / 邪典" },
+      "1100": { name: "吟游诗人", entry: "幕后 / 后排", tactic: "buff / 交涉 / 补伤害", power: "技艺 / 表演", society: "公共 / 社交" },
+      "1101": { name: "武僧 - 暗影", entry: "侧翼 / 幕后", tactic: "控制 / 刺杀准备", power: "身体 / 潜行", society: "隐秘" },
+      "1110": { name: "法师", entry: "后排", tactic: "控制 / 知识 / 输出", power: "奥术", society: "秩序 / 学术" },
+      "1111": { name: "德鲁伊 - 大地", entry: "后排 / 环境", tactic: "地形 / 自然塑形", power: "自然法术", society: "野性 / 反城镇" }
+    };
+
+    const careerAssets = {
+      "0000": {
+        image: "figs/战士.png",
+        description: "你是战士。你心思沉稳而笃定，在面对生活中的突发挑战或高压场景时，你极度反感弯弯绕绕，总是偏向于站在最正面迎难而上。你习惯用最直接、最有效的方式去“击杀”问题的核心。你深信千锤百炼的个人武技与硬实力胜过一切花言巧语，在人群中，你往往是那个维护规则与秩序的基石。有时你可能会让人觉得有些刻板或过于直接，但实际上这是因为你不屑于在无意义的内耗中浪费时间。"
+      },
+      "0001": {
+        image: "figs/野蛮人.png",
+        description: "你是野蛮人。你心思纯粹且充满直觉的智慧，在处理复杂的人际或面临压迫感的场景下，你往往倾向于撕破虚伪的表象，用最原始的爆发力去解决麻烦。你高度依赖自己身体机能与直觉的反馈，在社会框架中，你始终保留着一种不羁的边缘感与野性。别人或许会误以为你冲动，但只有你自己知道，在关键时刻听从内心的狂野呐喊，才是打破人生僵局的唯一真理。"
+      },
+      "0010": {
+        image: "figs/圣武士-先贤之誓.png",
+        description: "你是圣武士（先贤之誓）。你心思澄澈而庄重，在面对道德抉择或艰难困境时，你总是倾向于站在最前方，用非黑即白的果断去扫除阴霾。你内心深处被强烈的神圣信念与自我誓言所驱动，在人际交往中，你总是不自觉地散发出一种建立和维护秩序的灯塔气质。你偶尔会显得有些顽固甚至道德洁癖，那是因为你深知，有些底线是无论如何也不能妥协的。"
+      },
+      "0011": {
+        image: "figs/圣武士-复仇:破誓.png",
+        description: "你是圣武士（复仇 / 破誓）。你心思深邃且带着一丝决绝，在面对不公、背叛或是极度压抑的场景下，你倾向于抛弃繁文缛节，以最凌厉的正面手段直击要害。你同样被某种强烈的执念或过往的誓约所捆绑，但在主流社会规范面前，你表现出一种游走在边缘、甚至拥抱混沌的特质。人们容易被你身上那种亦正亦邪的矛盾感所吸引，却不知道你只是选择了一条更孤独、更极致的救赎之路。"
+      },
+      "0100": {
+        image: "figs/武僧-散打.png",
+        description: "你是武僧（散打）。你心思细腻且极具克制力，在冲突频发或混乱的场景中，你偏向于通过正面但精准的介入来掌控全局，而不是盲目发泄情绪。你坚信对自我身体与技艺的绝对掌控是一切力量的巅峰，在日常生活中，你展现出一种高度自律和尊崇秩序的古典美。你看起来总是波澜不惊，那是因为你早已学会将外界的波涛汹涌，化解于无形的拿捏与制衡之中。"
+      },
+      "0101": {
+        image: "figs/德鲁伊-月亮.png",
+        description: "你是德鲁伊（月亮）。你心思灵动且充满张力，在需要你承担责任或面对未知威胁时，你倾向于迅速调整自我状态，甚至在心理上“改头换面（变形）”去吸收压力、控制节奏。你拥有极强的适应力，这源于你内心深处那种不被定义的野性。在人群中你很难被完全驯服，你时而坚如磐石，时而狂野如风，因为你深知生存的最高法则就是顺应环境的百变。"
+      },
+      "0110": {
+        image: "figs/牧师-生命领域.png",
+        description: "你是牧师（生命领域）。你心思温润而包容，在团队陷入低谷或面临资源匮乏的场景下，你总是那个默默驻守阵地、为大家提供长效支援与续航的避风港。你相信某种超越个人的善意和神圣力量，在社会关系中，你是传统秩序与人道主义的坚定维护者。别人可能会觉得你有时过于牺牲自我，但只有当你看到周围人因你而重新焕发生机时，你才能获得真正的内心平静。"
+      },
+      "0111": {
+        image: "figs/牧师-死灵.png",
+        description: "你是牧师（死灵）。你心思幽微且洞察人性底色，在面对危机或复杂的博弈时，你倾向于在固定的领域内布下暗网，通过掌控事物的阴暗面或规律来确立优势。你对那些常人避之不及的禁忌知识或隐秘神术充满好奇，散发着一种生人勿近却又极具吸引力的边缘气质。你从不在乎世俗的偏见，因为你明白，掌控凋零与重生的界限，本身就是最高级别的控制权。"
+      },
+      "1000": {
+        image: "figs/战士-奥法大师:奥术射手.png",
+        description: "你是战士（奥法大师 / 奥术射手）。你心思缜密且富有条理，在处理具有挑战性的任务时，你偏向于在侧翼或拉开一点距离，进行冷静观察后，以精准和致命的方式一击破局。你的行事风格以务实的武技硬实力为骨架，同时又懂得借助智慧与巧思来增幅效果。你极度认同秩序，但你眼中的秩序是经过精心计算的，这让你在任何团队中都是那个最高效且致命的理性执行者。"
+      },
+      "1001": {
+        image: "figs/游侠:游荡者.png",
+        description: "你是游侠 / 游荡者。你心思敏锐且机警，在复杂的社交或竞争场景下，你往往不会主动站到聚光灯下，而是偏向于在幕后或侧翼游走，寻找一击必中、迅速撤离的最佳突袭时机。你对自己的专业技能和手中的“武器”有着极高的自信，在人群中散发着一种隐秘甚至有点边缘化的独狼气质。你很难对他人完全敞开心扉，因为你深知，保留底牌是保护自我最好的方式。"
+      },
+      "1010": {
+        image: "figs/牧师-光明.png",
+        description: "你是牧师（光明）。你心思热烈且充满宏大愿景，在面对群体性的困境或需要方向的时刻，你倾向于站在大后方统览全局，并用一种极具感染力、甚至爆发力的方式去进行“大面积清场”。你内心笃信着某种耀眼的神圣真理，这让你在社会结构中往往扮演着驱散混乱、带来秩序的启蒙者角色。你偶尔会显得有些耀眼得让人难以直视，那是因为你容不下任何藏污纳垢的角落。"
+      },
+      "1011": {
+        image: "figs/术士:邪术师.png",
+        description: "你是术士 / 邪术师。你心思莫测且充满激情，在平常的日子里你可能保持距离，但在关键时刻，你倾向于在安全的后排倾泻出令人震惊的爆发力。你的力量来源于某种与生俱来的天赋或是与未知事物达成的隐秘契约，这让你身上萦绕着一种难以名状的邪典与边缘气质。你不喜欢按部就班的规则，为了达成目的，你甚至愿意走一些看似危险的捷径，这种特质让你充满了危险的迷人魅力。"
+      },
+      "1100": {
+        image: "figs/吟游诗人.png",
+        description: "你是吟游诗人。你心思八面玲珑且极富共情力，在任何社交场合或团队协作中，你绝不强求出风头，而是偏向于在幕后通过沟通、协调与赋能，去弥补团队的短板。你深信语言、情绪和表演技艺的魔力，天生自带一种讨人喜欢的公共与社交气质。别人也许认为你只是个擅长活跃气氛的乐天派，但实际上，能够将形形色色的人无缝粘合在一起，是你洞察人心的最高体现。"
+      },
+      "1101": {
+        image: "figs/武僧-暗影.png",
+        description: "你是武僧（暗影）。你心思幽深且极其内敛，在面对危机或需要解决问题时，你极度抗拒正面硬碰硬，而是偏向于在侧翼或幕后默默铺垫、掌控节奏，为最终的“刺杀”做好万全准备。你将自我身体机能与潜行的艺术结合到了极致，在人群中，你几乎是一个隐形人，散发着极度私密的隐秘气质。你不渴望被理解或被注视，因为对你而言，不被察觉的行动才是最完美的杰作。"
+      },
+      "1110": {
+        image: "figs/法师.png",
+        description: "你是法师。你心思深沉且高度理性，在面对未知或复杂的局面时，你总是倾向于退居大后方，用知识和逻辑去解构问题，然后施展出精准的掌控与输出。你是一个典型的“大脑型”选手，坚信世间万物都有其深层的奥秘法则，在社会交往中，你散发着一种严谨、克制甚至带点清高的学术与秩序气质。你有时显得对人情世故漠不关心，那只是因为你的目光早已穿透了表象，聚焦在事物运转的底层逻辑上。"
+      },
+      "1111": {
+        image: "figs/德鲁伊-大地.png",
+        description: "你是德鲁伊（大地）。你心思旷达且充满宏观视角，在解决问题或面对挑战时，你很少纠结于一城一池的得失，而是倾向于退到大环境之中，通过重塑周围的规则与“地形”来自然而然地化解危机。你的内心与大自然的节律深度共鸣，在充满束缚的现代社会中，你始终带有一种与世无争却又根深蒂固的反城镇、纯野性气质。你不喜欢被框在狭小的规则里，因为你的灵魂需要整片旷野才能真正呼吸。"
+      }
+    };
+
+    const questions = [
+      q("你的队伍在野外遭到伏击，敌人数量不多也并不强，队伍的战斗力和机动性完全可以应对这种情况，但是什么都不做也会导致团灭。", "站住前排，构成防线与阵型，让队伍中的其他人找到阵型开始接战。", "带队转移，寻找优势地形，绕侧或者走位寻找反击机会。", "front", "left"),
+      q("战斗的尾声，你和仅存的队友血量都岌岌可危，不过唯一的强力敌人也濒死，剩下的都是不足为惧的小喽啰。你手中有一个治疗药水，腰间有一把飞刀。很不幸你只有做一个动作的时间了。", "把治疗药水砸向队友，稳扎稳打，没必要冒险。", "把飞刀扔向精英敌人，强敌死了再进行周旋救人也问题不大。", "tactic", "right"),
+      q("刚刚进入城镇，人生地不熟需要先了解一些情况。", "应该去问普通居民、神职人员或者官员，摸清城镇里衣食住行，说不定还能接到任务积累名声，其他边边角角的信息可以以后再说。", "应该去找小偷、地下社团或者特殊教会，了解城里的暗流、委托，或者解决特殊需求的场所，衣食住行这些常规需求总能想办法解决。", "society", "left"),
+      q("战斗中一个闪着符文的球状物滚到你队伍的脚下，马上要爆发出一个 5 米范围的高额群体伤害。", "直接一脚踢飞。", "立刻拍出法术无效卷轴。", "power", "left"),
+      q("你全副武装的队伍终于到达了冒险的终点，万事俱备，现在只需要击败最后的堕落法师。他最大的威胁是惊人的高血量。", "塑造地形，埋伏道具，准备长期 buff，预备削弱和反制法术。他血量高，这应该是持久战，只要拖到他法术资源耗尽就行。", "预备突袭，伤害加成和速度加成，尽量在前几轮击败他，即使血量高输出几轮也不会剩下多少，拖到后面他释放强力法术变数就太大了。", "tactic", "right"),
+      q("你的队伍在城外正要扎营休息，这时你远远看见一队城镇卫兵正要巡逻过来。你虽然携带皇家御令，但背包里也有不少邪神附魔的违禁品。", "多一事不如少一事，溜到林中扎营免得麻烦。", "直接扎营，我有皇家御令，卫兵必不敢搜身。", "society", "right"),
+      q("面见城主的过程中你被完全解除了武装，但是城主被敌对势力控制忽然发难，战斗已经不可避免。", "立刻寻求神灵护佑，神力的闪光击晕了城主，获得暂时的神力将卫兵迟滞得以脱身。", "立刻冲刺挟持城主，让敌人不敢轻举妄动，最后一拳打晕城主，闪转腾挪消失不见。", "power", "right"),
+      q("敌人的法师占据了坡顶优势地形开始攻击，你暂时被压制在原地。好在你资源还非常充分，在他吟唱法术的间隙，你会：", "立刻以移动法术为辅助进行快速逼近，迫使他离开位置或者制造近战机会。毕竟法师的弱点就是近战。", "闪入旁边树丛的射击死角，他为了找角度必然停止吟唱并且离开位置，这时候就有机会逆转形势进行反击。", "front", "left"),
+      q("一天后会有大量地精进攻你设立在开阔处的营地，这些地精非常弱，但是数量非常多，队伍里的法术资源有限。", "用法术改造地形，设立路障，迫使他们走特定路线，全队前往关键位置布设防御。", "准备火球术清场，再让物理输出的队友处理漏网之鱼即可。", "tactic", "right"),
+      q("只需要向邪灵低头祈祷就可以获得一个关乎你任务成功的关键知识。邪灵并没有在捣鬼，他单纯只是在这件事上和你利益相同。而且这件事只有你和邪灵知道，邪灵也不会到处乱说。", "再怎么样我都不会向邪灵祈祷，邪灵这种东西不配得到我的信仰。", "无所谓，反正事情能办完就是好的。", "society", "left"),
+      q("两年之后将迎来强敌，一个死灵法师将会带着一支亡灵大军进攻你的城市。由于后勤、治疗和辅助已经由教会负责，指挥官给了你两个选择。", "开始身体机能训练，你将穿戴上最好的精金重甲在城墙上顶住骷髅士兵的冲击。", "送去法师学院进行进修，你将被教授大范围迟滞和伤害法术进行输出。", "power", "left"),
+      q("你们进入一座疑似有陷阱的废墟。根据情报，这里的陷阱是警报、落石、毒针和短暂封门；队伍里有足够的治疗资源，也有擅长观察和解除陷阱的人。但时间有限，如果推进太慢，里面的敌人可能会完成转移。", "由你持盾或保持防御姿态走在最前，控制推进节奏。一旦触发机关，至少可以把第一轮伤害和混乱集中在你这里，后排和侦察者能立刻判断情势，做出反应。", "让召唤物探路或者让探测职业初步快速侦查，尽量找侧门、通风口或高处路线切入，你在后方等待信号进行冲锋，避免陷阱对队伍造成太多伤害影响后续接战。", "front", "left"),
+      q("队伍需要护送一名证人穿过战场。敌人战斗力一般，但会不断从两侧包抄；只要证人成功抵达城门，任务就完成。", "优先清掉每一波靠近的敌人，尤其是行动快、能贴近证人的目标。只要敌人死得足够快，证人就是安全的。", "优先减速、封路、制造烟雾或屏障，让敌人无法形成有效包围。杀人是没必要的，护送本身足够快就行。", "tactic", "left"),
+      q("队伍准备建立一个长期据点。你们需要休整、存放战利品、招募帮手，也要避免被老敌人轻易找到。城里有一处合法宅邸可以购买，位置安全，资源便利；城外废弃林地里也有一座旧哨站，可以改造成隐秘据点。", "选择城内宅邸。公开身份能换来合法保护、稳定补给和本地人脉；只要处理好关系，敌人也不敢随便在城里动手。", "选择城外旧哨站。那里不受城镇规矩限制，也更适合存放敏感物品、训练特殊盟友和隐藏行踪；补给麻烦一点可以自己解决。", "society", "left"),
+      q("敌人召唤了大量木板环绕在自己周围缓慢旋转，导致队伍里的远程手段全被挡住了。", "花里胡哨的，直接冲进去砍，木板挡得住魔法飞弹还能挡住巨斧不成？", "雕虫小技，悬浮术罢了，直接掏出沉默术卷轴让那一大片区域不能施法就行。", "power", "left"),
+      q("邪教徒祭祀站在大厅尽头的祭坛上开始吟唱，邪教护卫挡在队伍面前。法器分散在大厅四周需要破坏，如果什么都不做，召唤出来的邪神将完全超出小队的应对能力。", "让队友拖住邪教护卫，我将潜行传送到阴影中拆毁法器，如果先拆毁法器阻止召唤，邪教徒就直接溃散了。", "让队友去处理法器，我来处理正面战场。如果先推进到祭坛杀死祭司，召唤停止，剩下的邪教徒不足为惧。", "front", "right"),
+      q("敌方法师正在召唤援军，从三个传送门不断涌出敌人。不过他水平太差，召唤出来的敌人都非常弱，完全就是在送战利品，因此你和队友一致同意发一笔财，不过具体应该：", "我们先后撤拉扯，等他耗尽法力，敌人群聚，再一发大型攻击法术一网打尽。", "在传送门出口塞满荆棘和火墙，敌人出来一个死一个。", "tactic", "left"),
+      q("你的队伍和本地骑士团发生冲突。骑士团腐败，包庇贵族、压榨平民；但它也是附近唯一能维持治安、抵御怪物的武装力量。现在你掌握了能揭露他们罪行的证据。", "公开证据，联络教会、市民、市政官，甚至地区领主，逼迫骑士团接受审判或改革。这样我们的队伍将会得到极高的声望。", "官员不一定可靠，审判不一定正义，甚至这一拨人走了还会有下一拨腐败的骑士，把柄在我们手中反而能够让骑士团暗中为我们所用。", "society", "left"),
+      q("长久的祈祷终于让神明向你降下祝福，你可以选择一项，但是可惜只对你本人生效。", "获得灵活的身体，你可以跃上房顶，在一秒内冲出去 15 米。", "获得传送自身的能力，你可以传送到 20 米内任何你看得到而且能容纳你的位置。", "power", "left"),
+      q("你的队友不幸被包围，他身边现在有两个持刀歹徒蠢蠢欲动，伺机进攻，而你在 10 米外。", "先冲过去，只要能和队友背靠背站稳，互相照应，敌人就没法把他单独击倒。", "先用弓箭射向一个歹徒，如果只剩一个歹徒，队友一对一就没有劣势。", "front", "left"),
+      q("威武的大狗头人带着十几只小狗头人向你的队伍冲来，不过他们配合很差，大狗头人冲的太快，小狗头人被他远远落在身后。", "让法师用冰墙术隔断大小狗头人，让牧师给你加上祝福，你去和大狗头人单挑。", "让牧师给法师加伤害，法师用火球术先给大狗头人来一发狠的，你再去前排接战大狗头人。", "tactic", "right"),
+      q("你有要事需要联系到德鲁伊营地的大祭司，事情虽然短期内不紧急，但是最终事关整个地区的安危。不过大祭司正在主持仪式，除了完成了森林试炼被自然承认的人之外，其他德鲁伊拒绝任何人靠近仪式场所。", "好办，花一周时间完成试炼就是，无非就是麻烦点，多花点资源，没什么大不了。", "这群德鲁伊真是分不清轻重缓急，靠隐形传送先接近大祭司，事后再安抚其他德鲁伊。", "society", "left"),
+      q("过往神明的寺庙里摆放着一个华丽的箱子，这里并没有邪恶的气息，但是这位善良神明的名字早已遗失。箱子上的锁并不复杂，上面镌刻着一句祈祷的前半句，似乎背诵后半句就能开锁。", "没必要浪费时间，直接撬锁或者锤开就行，相信这位神明不会介意。", "这寺庙里应该还有经卷书籍，翻一翻应该就能找到这句祈祷。", "power", "left"),
+      q("一群异虫被你的队伍困在了狭长走廊里，它们没有智力，只知道冲向最近的敌人。现在只需要收尾把它们全部解决掉就行。", "来回跳跃拉扯，虫子靠近就转移到另一边，同时用远程手段慢慢消灭，反正虫子并不懂得自己被溜了。", "组织盾牌阵型向前推进，反正虫子的智力只会驱使它们啃咬盾牌，直接逼到角落全部消灭。", "front", "right"),
+      q("有一位有名的大法师想和你合作去诅咒之地取一样东西，不过这个大法师只会一个伤害法术：炉火纯青、出神入化的解离术。没有什么怪物能扛得住他的三发解离术。", "我应该转为辅助，给他增加 buff 和治疗。他活着就有输出。", "我应该转为保镖，给他解决漏掉的敌人，只要我们杀得够快就无敌了。", "tactic", "right"),
+      q("艰苦卓绝的战斗之后，你为这个地区的人民解决了长久以来的黑暗组织。除了给你的金钱奖励，市议会还决定为你举行盛大的庆功宴，歌颂你的名字，立起你的雕像。", "名声是一种诅咒，人应当保持低调，出名会带来敌人的注意，也必将影响我的行事。", "英雄理应得到赞颂，我的事迹将不断鼓舞后人，我的名字将被不断传颂。", "society", "right"),
+      q("你的队伍中来了一个年轻人，他是深水城贵族的儿子，仅仅是来你队伍里增加些履历。虽然无需教给他什么真材实学，还是要教给他一些最要紧的东西，以防后面去诅咒之地的冒险他出什么事情。", "体格是最重要的，没有健康的身体根本扛不住诅咒导致的疾病，一定要天天锻炼身体。我们队伍里有诅咒之地专家向导，你只要保持健康不要生病就好。", "知识是最重要的，知晓问题才能解决问题，一定要天天读这本《诅咒之地百科》。我们队伍里有医生可以解决疾病，你只要别乱碰东西闯祸就好。", "power", "left"),
+      q("大量敌人涌入，我方阵线马上就要崩溃。", "带领一小队战士殿后阻滞，且战且退，全部带上传送术，到时候直接撤退。", "带领一小队游侠引开敌人，带向岔路，到时候绕一圈脱身。", "front", "left"),
+      q("你守卫的油厂遭到了鱼人的攻击，混战中油桶全被打破了，易燃且滑腻的油脂流得满地都是。油本身估计是没法再回收了，不过似乎还能有别的作用。", "太好了，趁着他们在油脂上走一步摔三次，赶紧用远程收割。", "太好了，趁着他们踩在油脂上，赶紧一把火把它们全点着。", "tactic", "right"),
+      q("你队伍缺少一个牧师，因此你招募了一个颇有天赋的学徒。一次他遭遇危险而你营救了他。他因此向你道谢。", "保护弱小本身就是强大者理所应当的责任。", "你是我们队伍的未来，保证你的安全是我作为队长的责任。", "society", "left"),
+      q("你要想拜访一个知名的魔法教授拿到一本古老典籍。他在魔法塔的顶端，而整个塔的底部三层全是沉默术覆盖的区域。", "这有什么，无所谓，沉默术又不分敌我，真出事了大不了互相打一架。", "我决定飞到塔顶。", "power", "left"),
+      q("在攻城战中，士兵在附近发现了一个大缸，可以往里面灌东西然后用投石机扔到敌人城中。军需官翻遍营地发现了一瓶麻痹药和一瓶卓尔毒素，很不幸混合它们会导致失效。", "发射麻痹药，让敌人持续眩晕，动作迟缓，方便进攻。", "发射毒素，削弱敌人血量，加快收割。", "tactic", "right"),
+      q("你需要向城市中的乞丐打听一些消息，有时候乞丐掌握的要人行踪比间谍还准确。乞丐的胃口并不大，往往给点小钱就能换到情报。不过，威胁恐吓也无所谓，乞丐害怕拳头胜过挨饿，最重要的是没人在乎一个乞丐的消失。", "在一个四下无人的角落，拎起乞丐威胁给一拳就行了，没人会在意，简单方便。", "给点零钱就行了，还能换一个善人的名声，何乐而不为。", "society", "right"),
+      q("你为领主救回了他的女儿，除了钱和装备，领主准备派人给你画一幅肖像画作为额外答谢。画师向你征询画的风格。", "你站在城墙顶端举起长剑，威风，充满力量，面朝远方，披风在身后招展。", "你漂浮在蓝色梦幻般的空间中，身边被华丽的炫光包围，看起来神秘且充满智慧。", "power", "left"),
+      q("你与对手的实力太过接近，你们交手了一整天也没能分出胜负，最后一刀对砍把你们两个都震飞了出去，地面上出现了一个巨大的裂缝悬崖。你们两个都已经筋疲力尽，在悬崖处面面相觑。但是你还有最后一个传送卷轴。", "传送到他面前，今天必须抓住机会处理掉筋疲力尽的他，否则日后他变强更难办。", "传送远离，等我恢复状态，找到强力援助，成长一段时间再凭借优势解决他。", "tactic", "left"),
+      q("一个狡猾贵族出于政治目的处处针对你的派系，终于有一天他自己的勾当败露，考虑到他自己的护卫非常多，而且非常忠诚，市议会决定派遣卫队逮捕他。你的搭档是一位年轻贵族，虽然能力不行，他负责的事情搞不好会出纰漏，但是他愿意支持你的一切行动。", "让搭档带领卫队包围狡猾贵族的住宅，封锁路口，吸引护卫的注意，你亲自带领小队潜入贵族藏身处逮捕他。", "让搭档带领特遣队潜入贵族藏身处，你自己负责包围圈，保证什么都跑不出去。最后收紧兵力，直到逮捕成功。", "front", "right"),
+      q("你在山林中跋涉的时候发现了一个奇形怪状的生物，你从来没见过，也判断不出强弱。不巧的是它也发现了你，展开獠牙朝你直接扑过来。", "先跑，鬼知道这东西有多厉害，先跑到安全的地方再弄清楚这是什么。", "先防御还手，要是跑不过它还把背面暴露给它，搞不好真要出大事。", "front", "right"),
+      q("恶魔领主的进攻被挫败了，领主本人被放逐回了地狱，留下一大群次级恶魔畏畏缩缩，已经彻底失去士气。", "让队伍里的牧师释放威吓性质的圣光，能驱散就驱散，如果他们负隅顽抗再组织进攻。", "格杀勿论，不需要怜悯恶魔，更何况现在他们一触即溃。", "tactic", "right"),
+      q("在你功成身就之后，一群小孩围住你问道：“你是怎么成为传奇的？”", "我的毅力与坚持驱使我一步一步成长，在我回头的时候才发现我已经足够强大。", "我的智力是我的天赋，我的信仰是我的幸运，感谢命运使我变得足够强大。", "power", "left"),
+      q("在冒险的终点，你手握能够对人内心产生潜移默化影响的神器。这时候你想到了伟大的理想。", "让民众感受希望和信心，而你将带领他们建立一个伟大的国家，或者至少，带领身边的人得到幸福的生活。", "逐渐影响值得影响的人，最终无论是财富、权柄、知识还是法力都在你的操纵中，而到那时想要做什么，只有想象力能限制你。", "society", "left")
+    ];
+
+    const scale = [
+      { label: "特别同意 A", value: -2 },
+      { label: "比较倾向 A", value: -1 },
+      { label: "中立", value: 0 },
+      { label: "比较倾向 B", value: 1 },
+      { label: "特别同意 B", value: 2 }
+    ];
+
+    const answers = Array(questions.length).fill(null);
+    let current = 0;
+
+    const el = {
+      counter: document.querySelector("#counter"),
+      progress: document.querySelector("#progress"),
+      quiz: document.querySelector("#quiz"),
+      results: document.querySelector("#results"),
+      dimension: document.querySelector("#dimension"),
+      question: document.querySelector("#question"),
+      choiceA: document.querySelector("#choiceA"),
+      choiceB: document.querySelector("#choiceB"),
+      scale: document.querySelector("#scale"),
+      prev: document.querySelector("#prev"),
+      next: document.querySelector("#next"),
+      resultTitle: document.querySelector("#resultTitle"),
+      resultImage: document.querySelector("#resultImage"),
+      career: document.querySelector("#career"),
+      bars: document.querySelector("#bars"),
+      edit: document.querySelector("#edit"),
+      restart: document.querySelector("#restart")
+    };
+
+    function q(text, a, b, dimension, aSide) {
+      return { text, a, b, dimension, aSide };
+    }
+
+    function dimensionFor(key) {
+      return dimensions.find((item) => item.key === key);
+    }
+
+    function renderScale() {
+      el.scale.innerHTML = "";
+      scale.forEach((item) => {
+        const button = document.createElement("button");
+        button.type = "button";
+        button.textContent = item.label;
+        button.className = answers[current] === item.value ? "selected" : "";
+        button.addEventListener("click", () => {
+          answers[current] = item.value;
+          if (current < questions.length - 1) {
+            current += 1;
+            renderQuestion();
+          } else {
+            showResults();
+          }
+        });
+        el.scale.appendChild(button);
+      });
+    }
+
+    function renderQuestion() {
+      const item = questions[current];
+      const dimension = dimensionFor(item.dimension);
+      const answered = answers.filter((answer) => answer !== null).length;
+      el.counter.textContent = `第 ${current + 1} / ${questions.length} 题`;
+      el.progress.style.width = `${(answered / questions.length) * 100}%`;
+      el.dimension.textContent = `${dimension.name}：${dimension.left} vs ${dimension.right}`;
+      el.question.textContent = item.text;
+      el.choiceA.textContent = item.a;
+      el.choiceB.textContent = item.b;
+      el.prev.disabled = current === 0;
+      el.next.disabled = answers[current] === null;
+      el.next.textContent = current === questions.length - 1 ? "提交结果 →" : "下一题 →";
+      renderScale();
+      window.scrollTo({ top: 0, behavior: "smooth" });
+    }
+
+    function scoreAnswers() {
+      const result = Object.fromEntries(dimensions.map((dimension) => [
+        dimension.key,
+        { score: 0, max: 0, bit: "0", position: 50, leaning: "中线" }
+      ]));
+
+      questions.forEach((question, index) => {
+        const answer = answers[index] ?? 0;
+        const direction = question.aSide === "left" ? answer : -answer;
+        result[question.dimension].score += direction;
+        result[question.dimension].max += 2;
+      });
+
+      dimensions.forEach((dimension) => {
+        const item = result[dimension.key];
+        const ratio = item.max ? item.score / item.max : 0;
+        item.position = Math.max(0, Math.min(100, 50 + ratio * 50));
+        item.displayScore = Math.round(item.position);
+        item.bit = item.score > 0 ? "1" : "0";
+        item.leaning = item.score === 0 ? "中线" : item.score > 0 ? dimension.right : dimension.left;
+      });
+
+      return result;
+    }
+
+    function showResults() {
+      if (answers.some((answer) => answer === null)) return;
+      const scores = scoreAnswers();
+      const code = dimensions.map((dimension) => scores[dimension.key].bit).join("");
+      const career = careers[code];
+      const asset = careerAssets[code];
+
+      el.quiz.classList.add("hidden");
+      el.results.classList.remove("hidden");
+      el.counter.textContent = "结果";
+      el.progress.style.width = "100%";
+      el.resultTitle.innerHTML = `你更适合选择 <strong>${career.name}</strong> 职业`;
+      el.resultImage.hidden = false;
+      el.resultImage.src = asset.image;
+      el.resultImage.alt = career.name;
+      el.career.textContent = asset.description;
+      el.bars.innerHTML = "";
+
+      dimensions.forEach((dimension) => {
+        const item = scores[dimension.key];
+        const card = document.createElement("article");
+        card.className = "bar-card";
+        card.innerHTML = `
+          <div class="bar-head">
+            <strong>${dimension.name}</strong>
+            <span>${item.leaning}${item.score === 0 ? "，编码暂按左侧归类" : ""} · 分数 ${item.displayScore}</span>
+          </div>
+          <div class="bar" style="--pos:${item.position}%"></div>
+          <div class="bar-labels">
+            <span>${dimension.left}</span>
+            <span>${dimension.right}</span>
+          </div>
+        `;
+        el.bars.appendChild(card);
+      });
+
+      window.scrollTo({ top: 0, behavior: "smooth" });
+    }
+
+    el.prev.addEventListener("click", () => {
+      if (current > 0) {
+        current -= 1;
+        renderQuestion();
+      }
+    });
+
+    el.next.addEventListener("click", () => {
+      if (answers[current] === null) return;
+      if (current < questions.length - 1) {
+        current += 1;
+        renderQuestion();
+      } else {
+        showResults();
+      }
+    });
+
+    el.edit.addEventListener("click", () => {
+      el.results.classList.add("hidden");
+      el.quiz.classList.remove("hidden");
+      current = questions.length - 1;
+      renderQuestion();
+    });
+
+    el.restart.addEventListener("click", () => {
+      answers.fill(null);
+      current = 0;
+      el.results.classList.add("hidden");
+      el.quiz.classList.remove("hidden");
+      renderQuestion();
+    });
+
+    renderQuestion();
+  </script>
+</body>
+</html>
